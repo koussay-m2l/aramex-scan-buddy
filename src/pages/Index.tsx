@@ -81,7 +81,7 @@ const Index = () => {
               className="gap-2"
             >
               <Camera className="w-5 h-5" />
-              Scanner QR
+              Scanner Code-Barres
             </Button>
           </div>
         </div>

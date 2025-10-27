@@ -34,11 +34,11 @@ export const QRScanner = ({ onScan, isOpen, onClose }: QRScannerProps) => {
         { facingMode: "environment" },
         {
           fps: 10,
-          qrbox: { width: 250, height: 250 },
+          qrbox: { width: 250, height: 150 },
         },
         (decodedText) => {
           onScan(decodedText);
-          toast.success(`QR Code scanné: ${decodedText}`);
+          toast.success(`Code-barres scanné: ${decodedText}`);
           stopScanning();
           onClose();
         },
@@ -72,7 +72,7 @@ export const QRScanner = ({ onScan, isOpen, onClose }: QRScannerProps) => {
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-md p-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold">Scanner QR Code</h3>
+          <h3 className="text-lg font-semibold">Scanner Code-Barres</h3>
           <Button
             variant="ghost"
             size="icon"
@@ -89,7 +89,7 @@ export const QRScanner = ({ onScan, isOpen, onClose }: QRScannerProps) => {
           className="w-full rounded-lg overflow-hidden border-2 border-primary"
         ></div>
         <p className="text-sm text-muted-foreground mt-4 text-center">
-          Placez le QR code dans le cadre pour le scanner
+          Placez le code-barres dans le cadre pour le scanner
         </p>
       </Card>
     </div>
