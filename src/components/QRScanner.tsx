@@ -110,7 +110,7 @@ export const QRScanner = ({ onScan, isOpen, onClose }: QRScannerProps) => {
           <div className="flex gap-2">
             <Input
               type="text"
-              placeholder="Numéro de tracking"
+              placeholder="Waybill Number"
               value={manualCode}
               onChange={(e) => setManualCode(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleManualSubmit()}
