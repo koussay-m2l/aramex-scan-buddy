@@ -10,32 +10,23 @@ interface QRScannerProps {
   onScan: (code: string) => void;
   isOpen: boolean;
   onClose: () => void;
+  manualMode?: boolean;
 }
 
-export const QRScanner = ({ onScan, isOpen, onClose }: QRScannerProps) => {
+export const QRScanner = ({ onScan, isOpen, onClose, manualMode = false }: QRScannerProps) => {
   const [isScanning, setIsScanning] = useState(false);
   const [manualCode, setManualCode] = useState("");
-  const [showManualInput, setShowManualInput] = useState(false);
   const scannerRef = useRef<Html5Qrcode | null>(null);
 
   useEffect(() => {
-    if (isOpen && !isScanning && !showManualInput) {
+    if (isOpen && !manualMode && !isScanning) {
       startScanning();
     }
 
     return () => {
       stopScanning();
     };
-  }, [isOpen, showManualInput]);
-
-  useEffect(() => {
-    if (showManualInput && isScanning) {
-      stopScanning();
-      setIsScanning(false);
-    } else if (!showManualInput && isOpen && !isScanning) {
-      startScanning();
-    }
-  }, [showManualInput]);
+  }, [isOpen, manualMode]);
 
   const startScanning = async () => {
     try {
@@ -95,42 +86,26 @@ export const QRScanner = ({ onScan, isOpen, onClose }: QRScannerProps) => {
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-md p-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold">Scanner Code-Barres</h3>
-          <div className="flex gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setShowManualInput(!showManualInput)}
-              className="relative"
-            >
-              <Keyboard className="w-5 h-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => {
-                stopScanning();
-                onClose();
-              }}
-            >
-              <X className="w-5 h-5" />
-            </Button>
-          </div>
+          <h3 className="text-lg font-semibold">
+            {manualMode ? "Saisie Manuelle" : "Scanner Code-Barres"}
+          </h3>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              stopScanning();
+              onClose();
+            }}
+          >
+            <X className="w-5 h-5" />
+          </Button>
         </div>
         
-        {!showManualInput ? (
-          <>
-            <div
-              id="qr-reader"
-              className="w-full rounded-lg overflow-hidden border-2 border-primary"
-            ></div>
-            <p className="text-sm text-muted-foreground mt-4 text-center">
-              Placez le code-barres dans le cadre pour le scanner
-            </p>
-          </>
-        ) : (
+        {manualMode ? (
           <div className="space-y-4">
-            <p className="text-sm font-medium text-center">Saisir manuellement</p>
+            <p className="text-sm text-muted-foreground text-center">
+              Entrez le numéro de Waybill
+            </p>
             <div className="flex gap-2">
               <Input
                 type="text"
@@ -146,6 +121,16 @@ export const QRScanner = ({ onScan, isOpen, onClose }: QRScannerProps) => {
               </Button>
             </div>
           </div>
+        ) : (
+          <>
+            <div
+              id="qr-reader"
+              className="w-full rounded-lg overflow-hidden border-2 border-primary"
+            ></div>
+            <p className="text-sm text-muted-foreground mt-4 text-center">
+              Placez le code-barres dans le cadre pour le scanner
+            </p>
+          </>
         )}
       </Card>
     </div>

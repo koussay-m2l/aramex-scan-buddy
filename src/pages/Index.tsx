@@ -5,7 +5,7 @@ import { QRScanner } from "@/components/QRScanner";
 import { CustomerList } from "@/components/CustomerList";
 import { ScanResultModal } from "@/components/ScanResultModal";
 import { Button } from "@/components/ui/button";
-import { Camera, Users, Package, Scan } from "lucide-react";
+import { Camera, Users, Package, Scan, Keyboard } from "lucide-react";
 import { Customer, DeliveryData } from "@/types/delivery";
 import { toast } from "sonner";
 
@@ -17,6 +17,7 @@ const Index = () => {
     scannedParcels: 0,
   });
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [isManualInputOpen, setIsManualInputOpen] = useState(false);
   const [scanResultOpen, setScanResultOpen] = useState(false);
   const [scannedCustomer, setScannedCustomer] = useState<Customer | null>(null);
 
@@ -76,6 +77,7 @@ const Index = () => {
     setScannedCustomer(updatedCustomer || null);
     setScanResultOpen(true);
     setIsScannerOpen(false);
+    setIsManualInputOpen(false);
   };
 
   return (
@@ -97,15 +99,27 @@ const Index = () => {
                 </p>
               </div>
             </div>
-            <Button
-              size="lg"
-              onClick={() => setIsScannerOpen(true)}
-              disabled={deliveryData.customers.length === 0}
-              className="gap-2"
-            >
-              <Camera className="w-5 h-5" />
-              Scanner Code-Barres
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                size="lg"
+                onClick={() => setIsScannerOpen(true)}
+                disabled={deliveryData.customers.length === 0}
+                className="gap-2"
+              >
+                <Camera className="w-5 h-5" />
+                Scanner Code-Barres
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={() => setIsManualInputOpen(true)}
+                disabled={deliveryData.customers.length === 0}
+                className="gap-2"
+              >
+                <Keyboard className="w-5 h-5" />
+                Saisie Manuelle
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -172,6 +186,14 @@ const Index = () => {
         isOpen={isScannerOpen}
         onClose={() => setIsScannerOpen(false)}
         onScan={handleQRScan}
+      />
+
+      {/* Manual Input Modal */}
+      <QRScanner
+        isOpen={isManualInputOpen}
+        onClose={() => setIsManualInputOpen(false)}
+        onScan={handleQRScan}
+        manualMode
       />
 
       {/* Scan Result Modal */}
