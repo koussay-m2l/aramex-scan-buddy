@@ -28,9 +28,11 @@ export const FileUpload = ({ onDataLoaded }: FileUploadProps) => {
 
         const customers: Customer[] = jsonData.map((row: any, index) => ({
           id: `${index + 1}`,
-          name: row.client || row.Client || row.nom || row.Nom || row.name || row.Name || "Client sans nom",
-          parcels: parseInt(row.colis || row.Colis || row.parcels || row.Parcels || row.nombre || row.Nombre || "0"),
+          waybillNumber: row.waybill || row.Waybill || row.waybillNumber || row["Waybill Number"] || row.numero || row.Numero || "",
+          name: row.client || row.Client || row.nom || row.Nom || row.name || row.Name || row.receiver || row.Receiver || row["Receiver Name"] || "Client sans nom",
+          parcels: parseInt(row.colis || row.Colis || row.parcels || row.Parcels || row.nombre || row.Nombre || row.pieces || row.Pieces || "0"),
           scanned: false,
+          scannedParcels: 0,
         }));
 
         if (customers.length === 0) {
@@ -71,7 +73,7 @@ export const FileUpload = ({ onDataLoaded }: FileUploadProps) => {
             Glissez votre fichier Excel ici ou cliquez pour sélectionner
           </p>
           <p className="text-xs text-muted-foreground">
-            Le fichier doit contenir les colonnes : Client/Nom et Colis/Nombre
+            Le fichier doit contenir : Waybill Number, Receiver Name, et Pieces
           </p>
         </div>
         <Button className="mt-2">

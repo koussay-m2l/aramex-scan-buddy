@@ -3,6 +3,7 @@ import { FileUpload } from "@/components/FileUpload";
 import { StatsCard } from "@/components/StatsCard";
 import { QRScanner } from "@/components/QRScanner";
 import { CustomerList } from "@/components/CustomerList";
+import { ScanResultModal } from "@/components/ScanResultModal";
 import { Button } from "@/components/ui/button";
 import { Camera, Users, Package, Scan } from "lucide-react";
 import { Customer, DeliveryData } from "@/types/delivery";
@@ -16,6 +17,8 @@ const Index = () => {
     scannedParcels: 0,
   });
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [scanResultOpen, setScanResultOpen] = useState(false);
+  const [scannedCustomer, setScannedCustomer] = useState<Customer | null>(null);
 
   const handleDataLoaded = (customers: Customer[]) => {
     const totalParcels = customers.reduce((sum, c) => sum + c.parcels, 0);
@@ -28,31 +31,51 @@ const Index = () => {
   };
 
   const handleQRScan = (code: string) => {
+    const foundCustomer = deliveryData.customers.find(
+      (customer) => 
+        customer.waybillNumber.toLowerCase() === code.toLowerCase() ||
+        customer.id === code ||
+        customer.name.toLowerCase().includes(code.toLowerCase())
+    );
+
+    if (!foundCustomer) {
+      toast.error("Waybill Number non trouvé");
+      return;
+    }
+
     const updatedCustomers = deliveryData.customers.map((customer) => {
-      if (customer.id === code || customer.name.toLowerCase().includes(code.toLowerCase())) {
-        if (!customer.scanned) {
-          toast.success(`Client ${customer.name} scanné avec succès!`);
-          return {
-            ...customer,
-            scanned: true,
-            scanTime: new Date(),
-          };
-        } else {
-          toast.info(`Client ${customer.name} déjà scanné`);
-        }
+      if (customer.id === foundCustomer.id) {
+        const newScannedParcels = (customer.scannedParcels || 0) + 1;
+        const isComplete = newScannedParcels >= customer.parcels;
+        
+        toast.success(
+          isComplete 
+            ? `${customer.name} - Toutes les pièces scannées!` 
+            : `${customer.name} - Pièce scannée (${newScannedParcels}/${customer.parcels})`
+        );
+        
+        return {
+          ...customer,
+          scanned: isComplete,
+          scannedParcels: newScannedParcels,
+          scanTime: new Date(),
+        };
       }
       return customer;
     });
 
-    const scannedParcels = updatedCustomers
-      .filter((c) => c.scanned)
-      .reduce((sum, c) => sum + c.parcels, 0);
+    const scannedParcels = updatedCustomers.reduce((sum, c) => sum + (c.scannedParcels || 0), 0);
 
     setDeliveryData({
       ...deliveryData,
       customers: updatedCustomers,
       scannedParcels,
     });
+
+    const updatedCustomer = updatedCustomers.find((c) => c.id === foundCustomer.id);
+    setScannedCustomer(updatedCustomer || null);
+    setScanResultOpen(true);
+    setIsScannerOpen(false);
   };
 
   return (
@@ -149,6 +172,13 @@ const Index = () => {
         isOpen={isScannerOpen}
         onClose={() => setIsScannerOpen(false)}
         onScan={handleQRScan}
+      />
+
+      {/* Scan Result Modal */}
+      <ScanResultModal
+        isOpen={scanResultOpen}
+        onClose={() => setScanResultOpen(false)}
+        customer={scannedCustomer}
       />
     </div>
   );

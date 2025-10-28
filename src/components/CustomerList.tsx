@@ -30,12 +30,15 @@ export const CustomerList = ({ customers }: CustomerListProps) => {
               }`}
             >
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-1">
                   {customer.scanned && (
                     <CheckCircle2 className="w-5 h-5 text-success" />
                   )}
-                  <div>
+                  <div className="flex-1">
                     <p className="font-medium">{customer.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Waybill: {customer.waybillNumber || "N/A"}
+                    </p>
                     {customer.scanTime && (
                       <p className="text-xs text-muted-foreground">
                         Scanné à {customer.scanTime.toLocaleTimeString()}
@@ -43,9 +46,16 @@ export const CustomerList = ({ customers }: CustomerListProps) => {
                     )}
                   </div>
                 </div>
-                <Badge variant={customer.scanned ? "default" : "secondary"}>
-                  {customer.parcels} colis
-                </Badge>
+                <div className="flex flex-col gap-1 items-end">
+                  <Badge variant={customer.scanned ? "default" : "secondary"}>
+                    {customer.scannedParcels || 0}/{customer.parcels} colis
+                  </Badge>
+                  {(customer.scannedParcels || 0) < customer.parcels && (
+                    <span className="text-xs text-warning font-medium">
+                      {customer.parcels - (customer.scannedParcels || 0)} manquantes
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           ))
