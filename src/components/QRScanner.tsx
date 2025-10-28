@@ -19,14 +19,23 @@ export const QRScanner = ({ onScan, isOpen, onClose }: QRScannerProps) => {
   const scannerRef = useRef<Html5Qrcode | null>(null);
 
   useEffect(() => {
-    if (isOpen && !isScanning) {
+    if (isOpen && !isScanning && !showManualInput) {
       startScanning();
     }
 
     return () => {
       stopScanning();
     };
-  }, [isOpen]);
+  }, [isOpen, showManualInput]);
+
+  useEffect(() => {
+    if (showManualInput && isScanning) {
+      stopScanning();
+      setIsScanning(false);
+    } else if (!showManualInput && isOpen && !isScanning) {
+      startScanning();
+    }
+  }, [showManualInput]);
 
   const startScanning = async () => {
     try {
