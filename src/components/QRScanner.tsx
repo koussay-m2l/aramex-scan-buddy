@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Camera, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { X } from "lucide-react";
 import { toast } from "sonner";
 
 interface QRScannerProps {
@@ -13,6 +14,7 @@ interface QRScannerProps {
 
 export const QRScanner = ({ onScan, isOpen, onClose }: QRScannerProps) => {
   const [isScanning, setIsScanning] = useState(false);
+  const [manualCode, setManualCode] = useState("");
   const scannerRef = useRef<Html5Qrcode | null>(null);
 
   useEffect(() => {
@@ -54,12 +56,23 @@ export const QRScanner = ({ onScan, isOpen, onClose }: QRScannerProps) => {
     }
   };
 
+  const handleManualSubmit = () => {
+    if (manualCode.trim()) {
+      onScan(manualCode.trim());
+      toast.success(`Code saisi: ${manualCode.trim()}`);
+      setManualCode("");
+      onClose();
+    } else {
+      toast.error("Veuillez entrer un code");
+    }
+  };
+
   const stopScanning = async () => {
-    if (scannerRef.current && isScanning) {
+    if (scannerRef.current) {
       try {
         await scannerRef.current.stop();
+        scannerRef.current.clear();
         scannerRef.current = null;
-        setIsScanning(false);
       } catch (error) {
         console.error("Error stopping scanner:", error);
       }
@@ -91,6 +104,23 @@ export const QRScanner = ({ onScan, isOpen, onClose }: QRScannerProps) => {
         <p className="text-sm text-muted-foreground mt-4 text-center">
           Placez le code-barres dans le cadre pour le scanner
         </p>
+
+        <div className="mt-6 pt-6 border-t">
+          <p className="text-sm font-medium mb-3 text-center">Ou saisir manuellement</p>
+          <div className="flex gap-2">
+            <Input
+              type="text"
+              placeholder="Numéro de tracking"
+              value={manualCode}
+              onChange={(e) => setManualCode(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleManualSubmit()}
+              className="flex-1"
+            />
+            <Button onClick={handleManualSubmit}>
+              Valider
+            </Button>
+          </div>
+        </div>
       </Card>
     </div>
   );
