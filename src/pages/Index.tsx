@@ -31,13 +31,18 @@ const Index = () => {
     });
   };
 
-  const handleQRScan = (code: string) => {
-    const foundCustomer = deliveryData.customers.find(
-      (customer) => 
-        customer.waybillNumber.toLowerCase() === code.toLowerCase() ||
-        customer.id === code ||
-        customer.name.toLowerCase().includes(code.toLowerCase())
-    );
+  const handleQRScan = (rawCode: string) => {
+    const normalize = (s: string) =>
+      s?.toString().trim().toLowerCase().replace(/[\s\-_/]/g, "");
+
+    const code = normalize(rawCode);
+
+    const foundCustomer = deliveryData.customers.find((customer) => {
+      const wb = normalize(customer.waybillNumber || "");
+      const id = normalize(customer.id || "");
+      const name = (customer.name || "").toLowerCase().trim();
+      return wb === code || id === code || name.includes(rawCode.trim().toLowerCase());
+    });
 
     if (!foundCustomer) {
       toast.error("Waybill Number non trouvé");
@@ -46,7 +51,7 @@ const Index = () => {
 
     const updatedCustomers = deliveryData.customers.map((customer) => {
       if (customer.id === foundCustomer.id) {
-        const newScannedParcels = (customer.scannedParcels || 0) + 1;
+        const newScannedParcels = Math.min(customer.parcels, (customer.scannedParcels || 0) + 1);
         const isComplete = newScannedParcels >= customer.parcels;
         
         toast.success(
