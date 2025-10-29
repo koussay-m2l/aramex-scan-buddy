@@ -111,8 +111,9 @@ const Index = () => {
                 disabled={deliveryData.customers.length === 0}
                 className="gap-2"
               >
-                <Camera className="w-5 h-5" />
-                Scanner Code-Barres
+                <Camera className="w-4 h-4" />
+                <span className="hidden sm:inline">Scanner Code-Barres</span>
+                <span className="sm:hidden">Scanner</span>
               </Button>
               <Button
                 size="lg"
@@ -121,8 +122,9 @@ const Index = () => {
                 disabled={deliveryData.customers.length === 0}
                 className="gap-2"
               >
-                <Keyboard className="w-5 h-5" />
-                Saisie Manuelle
+                <Keyboard className="w-4 h-4" />
+                <span className="hidden sm:inline">Saisie Manuelle</span>
+                <span className="sm:hidden">Saisir</span>
               </Button>
             </div>
           </div>
