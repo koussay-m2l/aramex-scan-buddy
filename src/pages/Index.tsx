@@ -4,6 +4,7 @@ import { StatsCard } from "@/components/StatsCard";
 import { QRScanner } from "@/components/QRScanner";
 import { CustomerList } from "@/components/CustomerList";
 import { ScanResultModal } from "@/components/ScanResultModal";
+import { ScanCounter } from "@/components/ScanCounter";
 import { Button } from "@/components/ui/button";
 import { Camera, Users, Package, Scan, Keyboard } from "lucide-react";
 import { Customer, DeliveryData } from "@/types/delivery";
@@ -20,6 +21,7 @@ const Index = () => {
   const [isManualInputOpen, setIsManualInputOpen] = useState(false);
   const [scanResultOpen, setScanResultOpen] = useState(false);
   const [scannedCustomer, setScannedCustomer] = useState<Customer | null>(null);
+  const [currentScanningCustomer, setCurrentScanningCustomer] = useState<Customer | null>(null);
 
   const handleDataLoaded = (customers: Customer[]) => {
     const totalParcels = customers.reduce((sum, c) => sum + c.parcels, 0);
@@ -54,18 +56,23 @@ const Index = () => {
         const newScannedParcels = Math.min(customer.parcels, (customer.scannedParcels || 0) + 1);
         const isComplete = newScannedParcels >= customer.parcels;
         
-        toast.success(
-          isComplete 
-            ? `${customer.name} - Toutes les pièces scannées!` 
-            : `${customer.name} - Pièce scannée (${newScannedParcels}/${customer.parcels})`
-        );
-        
-        return {
+        const updatedCustomer = {
           ...customer,
           scanned: isComplete,
           scannedParcels: newScannedParcels,
           scanTime: new Date(),
         };
+        
+        // Update current scanning customer for the counter display
+        setCurrentScanningCustomer(updatedCustomer);
+        
+        toast.success(
+          isComplete 
+            ? `${customer.name} - Toutes les pièces scannées!` 
+            : `Colis ${newScannedParcels}/${customer.parcels} scanné`
+        );
+        
+        return updatedCustomer;
       }
       return customer;
     });
@@ -86,6 +93,7 @@ const Index = () => {
       setScanResultOpen(true);
       setIsScannerOpen(false);
       setIsManualInputOpen(false);
+      setCurrentScanningCustomer(null);
     }
     // Scanner stays open for next scan
   };
@@ -207,6 +215,11 @@ const Index = () => {
         onScan={handleQRScan}
         manualMode
       />
+
+      {/* Scan Counter - Shows during active scanning */}
+      {(isScannerOpen || isManualInputOpen) && currentScanningCustomer && (
+        <ScanCounter customer={currentScanningCustomer} />
+      )}
 
       {/* Scan Result Modal */}
       <ScanResultModal
