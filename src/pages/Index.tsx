@@ -78,11 +78,16 @@ const Index = () => {
       scannedParcels,
     });
 
+    // Keep scanner open for continuous scanning
+    // Only close scanner when all parcels for this customer are scanned
     const updatedCustomer = updatedCustomers.find((c) => c.id === foundCustomer.id);
-    setScannedCustomer(updatedCustomer || null);
-    setScanResultOpen(true);
-    setIsScannerOpen(false);
-    setIsManualInputOpen(false);
+    if (updatedCustomer && updatedCustomer.scannedParcels === updatedCustomer.parcels) {
+      setScannedCustomer(updatedCustomer);
+      setScanResultOpen(true);
+      setIsScannerOpen(false);
+      setIsManualInputOpen(false);
+    }
+    // Scanner stays open for next scan
   };
 
   return (
