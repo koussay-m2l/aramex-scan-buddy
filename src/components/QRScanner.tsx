@@ -75,11 +75,8 @@ export const QRScanner = ({ onScan, isOpen, onClose, manualMode = false }: QRSca
   const handleManualSubmit = () => {
     if (manualCode.trim()) {
       onScan(manualCode.trim());
-      toast.success(`Code saisi: ${manualCode.trim()}`);
       setManualCode("");
-      onClose();
-    } else {
-      toast.error("Veuillez entrer un code");
+      // Ne pas fermer le modal pour permettre le scan continu
     }
   };
 
@@ -119,22 +116,17 @@ export const QRScanner = ({ onScan, isOpen, onClose, manualMode = false }: QRSca
         {manualMode ? (
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground text-center">
-              Entrez le numéro de Waybill
+              Scannez avec le détecteur infrarouge
             </p>
-            <div className="flex gap-2">
-              <Input
-                type="text"
-                placeholder="Waybill Number"
-                value={manualCode}
-                onChange={(e) => setManualCode(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleManualSubmit()}
-                className="flex-1"
-                autoFocus
-              />
-              <Button onClick={handleManualSubmit}>
-                Valider
-              </Button>
-            </div>
+            <Input
+              type="text"
+              placeholder="Waybill Number"
+              value={manualCode}
+              onChange={(e) => setManualCode(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleManualSubmit()}
+              className="w-full text-lg"
+              autoFocus
+            />
           </div>
         ) : isSunmiDevice ? (
           <div className="space-y-4">

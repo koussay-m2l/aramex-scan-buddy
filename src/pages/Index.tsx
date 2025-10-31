@@ -6,7 +6,7 @@ import { CustomerList } from "@/components/CustomerList";
 import { ScanResultModal } from "@/components/ScanResultModal";
 import { ScanCounter } from "@/components/ScanCounter";
 import { Button } from "@/components/ui/button";
-import { Camera, Users, Package, Scan, Keyboard } from "lucide-react";
+import { Users, Package, Scan, Keyboard } from "lucide-react";
 import { Customer, DeliveryData } from "@/types/delivery";
 import { toast } from "sonner";
 
@@ -117,29 +117,16 @@ const Index = () => {
                 </p>
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button
-                size="lg"
-                onClick={() => setIsScannerOpen(true)}
-                disabled={deliveryData.customers.length === 0}
-                className="gap-2"
-              >
-                <Camera className="w-4 h-4" />
-                <span className="hidden sm:inline">Scanner Code-Barres</span>
-                <span className="sm:hidden">Scanner</span>
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={() => setIsManualInputOpen(true)}
-                disabled={deliveryData.customers.length === 0}
-                className="gap-2"
-              >
-                <Keyboard className="w-4 h-4" />
-                <span className="hidden sm:inline">Saisie Manuelle</span>
-                <span className="sm:hidden">Saisir</span>
-              </Button>
-            </div>
+            <Button
+              size="lg"
+              onClick={() => setIsManualInputOpen(true)}
+              disabled={deliveryData.customers.length === 0}
+              className="gap-2"
+            >
+              <Keyboard className="w-4 h-4" />
+              <span className="hidden sm:inline">Scanner Colis</span>
+              <span className="sm:hidden">Scanner</span>
+            </Button>
           </div>
         </div>
       </header>
@@ -200,13 +187,6 @@ const Index = () => {
           )}
         </div>
       </main>
-
-      {/* QR Scanner Modal */}
-      <QRScanner
-        isOpen={isScannerOpen}
-        onClose={() => setIsScannerOpen(false)}
-        onScan={handleQRScan}
-      />
 
       {/* Manual Input Modal */}
       <QRScanner
