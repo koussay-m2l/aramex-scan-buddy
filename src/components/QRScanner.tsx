@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { X, Keyboard } from "lucide-react";
 import { toast } from "sonner";
+import { Capacitor } from "@capacitor/core";
+import { useSunmiScanner } from "@/hooks/useSunmiScanner";
 
 interface QRScannerProps {
   onScan: (code: string) => void;
@@ -17,16 +19,29 @@ export const QRScanner = ({ onScan, isOpen, onClose, manualMode = false }: QRSca
   const [isScanning, setIsScanning] = useState(false);
   const [manualCode, setManualCode] = useState("");
   const scannerRef = useRef<Html5Qrcode | null>(null);
+  const isSunmiDevice = Capacitor.getPlatform() === 'android';
+  
+  // Use Sunmi scanner when on Sunmi device and not in manual mode
+  const handleSunmiScan = (code: string) => {
+    onScan(code);
+    toast.success(`Code-barres scanné: ${code}`);
+    onClose();
+  };
+  
+  useSunmiScanner(handleSunmiScan, isOpen && !manualMode && isSunmiDevice);
 
   useEffect(() => {
-    if (isOpen && !manualMode && !isScanning) {
+    // Only use camera scanner on non-Sunmi devices
+    if (isOpen && !manualMode && !isScanning && !isSunmiDevice) {
       startScanning();
     }
 
     return () => {
-      stopScanning();
+      if (!isSunmiDevice) {
+        stopScanning();
+      }
     };
-  }, [isOpen, manualMode]);
+  }, [isOpen, manualMode, isSunmiDevice]);
 
   const startScanning = async () => {
     try {
@@ -119,6 +134,20 @@ export const QRScanner = ({ onScan, isOpen, onClose, manualMode = false }: QRSca
               <Button onClick={handleManualSubmit}>
                 Valider
               </Button>
+            </div>
+          </div>
+        ) : isSunmiDevice ? (
+          <div className="space-y-4">
+            <div className="flex flex-col items-center justify-center py-8">
+              <div className="w-16 h-16 mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                <span className="text-3xl">📱</span>
+              </div>
+              <p className="text-lg font-semibold text-center mb-2">
+                Scanner Prêt
+              </p>
+              <p className="text-sm text-muted-foreground text-center">
+                Utilisez le bouton de scan du terminal Sunmi
+              </p>
             </div>
           </div>
         ) : (
